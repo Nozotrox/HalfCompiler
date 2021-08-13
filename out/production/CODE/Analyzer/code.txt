@@ -1,0 +1,3 @@
+do {
+    int val = 0;
+} while (true);
