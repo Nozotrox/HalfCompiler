@@ -1,6 +1,22 @@
 import Analyzer.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
 public class Main {
+    public static String getInputFromFile(String filePath) throws FileNotFoundException {
+        File file = new File(filePath);
+        Scanner sc = new Scanner(file);
+        String content = "";
+        while (sc.hasNextLine())
+            content += " " + sc.nextLine();
+        return content;
+    }
+
     public static void main(String[] args){
         String empty = AutomataStack.DEFAULT_EMPTY_STACK_SYMBOL;
         StackOperation maintain = StackOperation.MAINTAIN;
@@ -12,10 +28,13 @@ public class Main {
         State ef = new State("ef", true, false);
         //:: INTERMEDIARY STATES
         State qa = new State("qa");
-        State qb = new State("qb");
         State qc = new State("qc");
         State qd = new State("qd");
         State qe = new State("qe");
+        State qf = new State("qf");
+        State qg = new State("qg");
+        State qh = new State("qh");
+        State qi = new State("qi");
 
 
         //::: TRANSITIONS
@@ -25,9 +44,6 @@ public class Main {
 
         PDTransintion tOcb1 = new PDTransintion("{", empty, maintain, q1);
         PDTransintion tOcb2 = new PDTransintion("{", "do", maintain, q1);
-
-        PDTransintion tSpace1 = new PDTransintion("_", empty, maintain, qb);
-        PDTransintion tSpace2 = new PDTransintion("_", "do", maintain, qb);
 
         PDTransintion tCcb1 = new PDTransintion("}", empty, maintain, qc);
         PDTransintion tCcb2 = new PDTransintion("}", "do", maintain, qc);
@@ -50,6 +66,23 @@ public class Main {
         PDTransintion tSc1 = new PDTransintion(";", "do", StackOperation.ERASE, q1);
         PDTransintion tSc2 = new PDTransintion(";", empty, maintain, ef);
 
+        PDTransintion tType1 = new PDTransintion("type_tkn", empty, maintain, qf);
+        PDTransintion tType2 = new PDTransintion("type_tkn", "do", maintain, qf);
+
+        PDTransintion tIdentifier1 = new PDTransintion("id_tkn", empty, maintain, qg);
+        PDTransintion tIdentifier2 = new PDTransintion("id_tkn", "do", maintain, qg);
+
+        PDTransintion tEquals1 = new PDTransintion("=", empty, maintain, qh);
+        PDTransintion tEquals2 = new PDTransintion("=", "do", maintain, qh);
+
+        PDTransintion tCharLit1 = new PDTransintion("charLit_tkn", empty, maintain, qi);
+        PDTransintion tCharLit2 = new PDTransintion("charLit_tkn", "do", maintain, qi);
+
+        PDTransintion tBoolean1 = new PDTransintion("boolean_tkn", empty, maintain, qi);
+        PDTransintion tBoolean2 = new PDTransintion("boolean_tkn", "do", maintain, qi);
+
+        PDTransintion tSemiColon1 =  new PDTransintion(";", empty, maintain, q1);
+        PDTransintion tSemiColon2 =  new PDTransintion(";", "do", maintain, q1);
 
         //::: ADDING TRANSITIONS TO STATE
         q0.addTransition(tDo1);
@@ -59,11 +92,28 @@ public class Main {
 
         q1.addTransition(tDo2);
         q1.addTransition(tDo3);
-        q1.addTransition(tSpace1);
-        q1.addTransition(tSpace2);
+        q1.addTransition(tIdentifier1);
+        q1.addTransition(tIdentifier2);
+        q1.addTransition(tType1);
+        q1.addTransition(tType2);
+        q1.addTransition(tCcb1);
+        q1.addTransition(tCcb2);
 
-        qb.addTransition(tCcb1);
-        qb.addTransition(tCcb2);
+
+        qf.addTransition(tIdentifier1);
+            qf.addTransition(tIdentifier2);
+
+            qg.addTransition(tEquals1);
+            qg.addTransition(tEquals2);
+
+            qh.addTransition(tCharLit1);
+            qh.addTransition(tCharLit2);
+            qh.addTransition(tBoolean1);
+            qh.addTransition(tBoolean2);
+
+            qi.addTransition(tSemiColon1);
+            qi.addTransition(tSemiColon2);
+
 
         qc.addTransition(tWhile1);
         qc.addTransition(tWhile2);
@@ -84,7 +134,19 @@ public class Main {
 
         //::: Ainda liguei o processo de tokenizacao com o de parsint. Este parsing esta incompleto.
         // Reconhece domente doWhiles com um _ entre o corpo. Todos tokens devem ser separados por espaco.
-        PushDownAutomata pda = new PushDownAutomata(q0, "do { do { _ } while ( true ) ; do { do { do { _ } while ( true ) ; _ } while ( true ) ; _ } while ( true ) ; _ } while ( true ) ;");
-        pda.validateInput();
+        try {
+            File contentFile = new File("D:\\Feliciano\\ISCTEM\\Quarto_Ano\\Primeiro_Semestre\\Compiladores\\CODE\\src\\dowhile.txt");
+            Tokenizer tk = new Tokenizer(contentFile);
+            tk.parseTokens();
+            ArrayList<String> tokens = tk.parseTokensAsString();
+//            tk.printParsedTokens();
+            PushDownAutomata pda = new PushDownAutomata(q0, tokens);
+            pda.validateInput();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

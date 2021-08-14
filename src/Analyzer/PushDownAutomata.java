@@ -3,13 +3,14 @@ package Analyzer;
 import Exceptions.EmptyAutomataStackException;
 
 import javax.naming.OperationNotSupportedException;
+import java.util.ArrayList;
 
 public class PushDownAutomata extends  StateMachine {
     private StateMachineProcessPrinter printer;
     private int currentIndex = 0;
     AutomataStack stack;
 
-    public PushDownAutomata(State initialState, String entries) {
+    public PushDownAutomata(State initialState, ArrayList<String> entries) {
         super(initialState, entries);
         this.stack = new AutomataStack();
         this.printer = new StateMachineProcessPrinter(this.stack);

@@ -1,0 +1,4 @@
+do {
+    type_tkn id_tkn = charLit_tkn;
+    id_tkn = charLit_tkn;
+} while(true);

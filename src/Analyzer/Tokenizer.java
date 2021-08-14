@@ -6,38 +6,55 @@ import java.util.ArrayList;
 public class Tokenizer {
     private static final int QUOTE_CHARACTER = '\'';
     private static final int DOUBLE_QUOTE_CHARACTER = '\"';
-    private static ArrayList<Object> tokens = new ArrayList<>();
+    private  ArrayList<Object> tokens = new ArrayList<>();
+    private File contentFile;
 
-    public static void main(String[] args){
-        try {
-            FileReader fr = new FileReader(new File("D:\\Feliciano\\ISCTEM\\Quarto_Ano\\Primeiro_Semestre\\Compiladores\\CODE\\src\\code.txt"));
-            tokenize(fr);
-        } catch (FileNotFoundException e) {
-            System.out.println("COULD NOT FIND FILE.");
-            e.printStackTrace();
-        } catch (IOException e) {
-            System.out.println("TYPE ERROR.");
-            e.printStackTrace();
-        }
+    public Tokenizer (File contentFile) {
+        this.contentFile = contentFile;
     }
 
-    private static void tokenize(FileReader fr) throws IOException {
-        StreamTokenizer streamTokenizer = new StreamTokenizer(fr);
+    public void printParsedTokens() {
+        for(Object token: tokens)
+            System.out.println("TOKEN: " + token);
+    }
 
+    public void parseTokens( ) throws IOException {
+        FileReader fr = new FileReader(this.contentFile);
+        StreamTokenizer streamTokenizer = new StreamTokenizer(fr);
+        tokens = tokenize(streamTokenizer);
+    }
+
+    private ArrayList<Object>  tokenize(StreamTokenizer streamTokenizer) throws IOException {
+        ArrayList<Object> tokens = new ArrayList<>();
         int currentToken = streamTokenizer.nextToken();
         while(currentToken != StreamTokenizer.TT_EOF) {
             if(streamTokenizer.ttype == StreamTokenizer.TT_WORD) {
                 tokens.add(streamTokenizer.sval);
-                System.out.println("WORD: " + streamTokenizer.sval);
             } else if (streamTokenizer.ttype == StreamTokenizer.TT_NUMBER) {
                 tokens.add(streamTokenizer.nval);
-                System.out.println("NUMBER: " + streamTokenizer.nval);
             } else {
                 tokens.add((char) currentToken);
-                System.out.println("ORDINARY: " + ((char) currentToken));
             }
             currentToken = streamTokenizer.nextToken();
         }
+        return tokens;
     }
+
+    //::>> #TODO: REMOVE THIS LATER
+    public ArrayList<String> parseTokensAsString() throws IOException {
+        FileReader fr = new FileReader(this.contentFile);
+        StreamTokenizer streamTokenizer = new StreamTokenizer(fr);
+        streamTokenizer.wordChars('_', '_');
+        tokens = tokenize(streamTokenizer);
+        ArrayList<String> sTokens = new ArrayList<>();
+        for(Object token: tokens)
+            sTokens.add(String.valueOf(token));
+        return sTokens;
+    }
+
+    public ArrayList<Object> getTokens() {
+        return tokens;
+    }
+
 
 }

@@ -7,12 +7,9 @@ public abstract  class StateMachine {
     protected State currentState;
     protected ArrayList<String> entries;
 
-    public StateMachine(State initialState, String input) {
+    public StateMachine(State initialState, ArrayList<String> input) {
         this(initialState);
-        String[] inputEntries = input.split(" ");
-        for (String character : inputEntries)
-            this.entries.add(character);
-
+        this.entries = input;
     }
 
     private StateMachine(State initialState) {
