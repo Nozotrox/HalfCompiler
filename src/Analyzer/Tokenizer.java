@@ -14,42 +14,56 @@ public class Tokenizer {
     }
 
     public void printParsedTokens() {
-        for(Object token: tokens)
-            System.out.println("TOKEN: " + token);
+        Token token;
+        for(Object obj: tokens) {
+            token = (Token) obj;
+            System.out.printf(" %-30s  %-30s  %10s \n", token.getTokenType(),token.getTokenString(), token.getLine());
+        }
     }
 
     public void parseTokens( ) throws IOException {
+        StreamTokenizer streamTokenizer = getConfiguredTokenizer();
+        tokens = tokenize(streamTokenizer);
+    }
+
+    private StreamTokenizer getConfiguredTokenizer() throws FileNotFoundException {
         FileReader fr = new FileReader(this.contentFile);
         StreamTokenizer streamTokenizer = new StreamTokenizer(fr);
-        tokens = tokenize(streamTokenizer);
+        streamTokenizer.eolIsSignificant(true);
+        return streamTokenizer;
     }
 
     private ArrayList<Object>  tokenize(StreamTokenizer streamTokenizer) throws IOException {
         ArrayList<Object> tokens = new ArrayList<>();
-        int currentToken = streamTokenizer.nextToken();
-        while(currentToken != StreamTokenizer.TT_EOF) {
+        int currentTokenCode = streamTokenizer.nextToken();
+        char currentToken;
+        Token token, linkedToken;
+        int line = 1;
+
+        while(currentTokenCode != StreamTokenizer.TT_EOF) {
             if(streamTokenizer.ttype == StreamTokenizer.TT_WORD) {
-                tokens.add(streamTokenizer.sval);
+                token = Token.buildWordToken(streamTokenizer.sval, line);
+                tokens.add(token);
             } else if (streamTokenizer.ttype == StreamTokenizer.TT_NUMBER) {
                 tokens.add(streamTokenizer.nval);
+            } else if(streamTokenizer.ttype == StreamTokenizer.TT_EOL) {
+                line++;
             } else {
-                tokens.add((char) currentToken);
+                currentToken = (char) currentTokenCode;
+                token = Token.buildOrdinaryToken(currentToken, line);
+                tokens.add(token);
+                if(containsToken(streamTokenizer)) {
+                    linkedToken = Token.buildTokenLinkedWithToken(token, streamTokenizer.sval, line);
+                    tokens.add(linkedToken);
+                }
             }
-            currentToken = streamTokenizer.nextToken();
+            currentTokenCode = streamTokenizer.nextToken();
         }
         return tokens;
     }
 
-    //::>> #TODO: REMOVE THIS LATER
-    public ArrayList<String> parseTokensAsString() throws IOException {
-        FileReader fr = new FileReader(this.contentFile);
-        StreamTokenizer streamTokenizer = new StreamTokenizer(fr);
-        streamTokenizer.wordChars('_', '_');
-        tokens = tokenize(streamTokenizer);
-        ArrayList<String> sTokens = new ArrayList<>();
-        for(Object token: tokens)
-            sTokens.add(String.valueOf(token));
-        return sTokens;
+    private boolean containsToken(StreamTokenizer streamTokenizer) {
+        return (streamTokenizer.sval != null);
     }
 
     public ArrayList<Object> getTokens() {

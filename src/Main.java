@@ -136,12 +136,15 @@ public class Main {
         // Reconhece domente doWhiles com um _ entre o corpo. Todos tokens devem ser separados por espaco.
         try {
             File contentFile = new File("D:\\Feliciano\\ISCTEM\\Quarto_Ano\\Primeiro_Semestre\\Compiladores\\CODE\\src\\dowhile.txt");
+            //:: Analise Lexica
             Tokenizer tk = new Tokenizer(contentFile);
             tk.parseTokens();
-            ArrayList<String> tokens = tk.parseTokensAsString();
-//            tk.printParsedTokens();
-            PushDownAutomata pda = new PushDownAutomata(q0, tokens);
-            pda.validateInput();
+//            ArrayList<String> tokens = tk.parseTokensAsString();
+            tk.printParsedTokens();
+            //:: Analise Sintatica
+//            PushDownAutomata pda = new PushDownAutomata(q0, tokens);
+//            pda.validateInput();
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

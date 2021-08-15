@@ -1,4 +1,5 @@
-do {
-    type_tkn id_tkn = charLit_tkn;
-    id_tkn = charLit_tkn;
+do{
+    char id = false;
+    id = 'c';
 } while(true);
+
