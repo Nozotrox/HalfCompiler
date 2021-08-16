@@ -1,11 +1,11 @@
-package Analyzer;
+package Analyzers;
 
+import Analyzers.Lexical.Token;
 import Exceptions.EmptyAutomataStackException;
 import Exceptions.StateNotFoundException;
 
 import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
-import java.util.Stack;
 
 public class State {
     private String name;
@@ -24,10 +24,10 @@ public class State {
         this(name, false, false);
     }
 
-    public State moveToNextStateWith(String entrySymbol, AutomataStack stack) throws EmptyAutomataStackException, OperationNotSupportedException {
+    public State moveToNextStateWith(Token entryToken, AutomataStack stack) throws EmptyAutomataStackException, OperationNotSupportedException, StateNotFoundException {
         State nextState = null;
         for (PDTransintion transition : this.transitions) {
-            if(transition.isTransitionalWith(entrySymbol, stack.getTopOfStack())) {
+            if(transition.isTransitionalWith(entryToken, stack.getTopOfStack())) {
                 nextState = transition.getDestinationState();
                 transition.performTransition(stack);
                 break;
@@ -35,7 +35,7 @@ public class State {
         }
 
         if(nextState == null)
-            throw new StateNotFoundException("Could not find state of transition " + entrySymbol + ".");
+            throw new StateNotFoundException("Could not find state of transition " + entryToken.getTokenString() + ".", entryToken.getLine());
 
         return nextState;
     }

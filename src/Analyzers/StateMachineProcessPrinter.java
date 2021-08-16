@@ -1,4 +1,4 @@
-package Analyzer;
+package Analyzers;
 
 import java.util.ArrayList;
 

@@ -1,13 +1,14 @@
-package Analyzer;
+package Analyzers;
+
+import Analyzers.Lexical.Token;
 
 import java.util.ArrayList;
-import java.util.EmptyStackException;
 
 public abstract  class StateMachine {
     protected State currentState;
-    protected ArrayList<String> entries;
+    protected ArrayList<Token> entries;
 
-    public StateMachine(State initialState, ArrayList<String> input) {
+    public StateMachine(State initialState, ArrayList<Token> input) {
         this(initialState);
         this.entries = input;
     }

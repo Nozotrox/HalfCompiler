@@ -1,8 +1,11 @@
-import Analyzer.*;
+import Analyzers.*;
+import Analyzers.Lexical.LexicalAnalyzer;
+import Analyzers.Lexical.Token;
+import Exceptions.CustomException;
+import Exceptions.TypeErrorException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -16,6 +19,8 @@ public class Main {
             content += " " + sc.nextLine();
         return content;
     }
+
+
 
     public static void main(String[] args){
         String empty = AutomataStack.DEFAULT_EMPTY_STACK_SYMBOL;
@@ -36,53 +41,52 @@ public class Main {
         State qh = new State("qh");
         State qi = new State("qi");
 
-
         //::: TRANSITIONS
-        PDTransintion tDo1 = new PDTransintion("do", empty, maintain, qa);
-        PDTransintion tDo2 = new PDTransintion("do", empty, StackOperation.INSERT, qa);
-        PDTransintion tDo3 = new PDTransintion("do", "do", StackOperation.INSERT, qa);
+        PDTransintion tDo1 = new PDTransintion(TokenType.DO, empty, maintain, qa);
+        PDTransintion tDo2 = new PDTransintion(TokenType.DO, empty, StackOperation.INSERT, qa);
+        PDTransintion tDo3 = new PDTransintion(TokenType.DO, "do", StackOperation.INSERT, qa);
 
-        PDTransintion tOcb1 = new PDTransintion("{", empty, maintain, q1);
-        PDTransintion tOcb2 = new PDTransintion("{", "do", maintain, q1);
+        PDTransintion tOcb1 = new PDTransintion(TokenType.OPEN_CURLY_BRACKET, empty, maintain, q1);
+        PDTransintion tOcb2 = new PDTransintion(TokenType.OPEN_CURLY_BRACKET, "do", maintain, q1);
 
-        PDTransintion tCcb1 = new PDTransintion("}", empty, maintain, qc);
-        PDTransintion tCcb2 = new PDTransintion("}", "do", maintain, qc);
+        PDTransintion tCcb1 = new PDTransintion(TokenType.CLOSE_CURLY_BRACKET, empty, maintain, qc);
+        PDTransintion tCcb2 = new PDTransintion(TokenType.CLOSE_CURLY_BRACKET, "do", maintain, qc);
 
-        PDTransintion tWhile1 = new PDTransintion("while", empty, maintain, qd);
-        PDTransintion tWhile2 = new PDTransintion("while", "do", maintain, qd);
+        PDTransintion tWhile1 = new PDTransintion(TokenType.WHILE, empty, maintain, qd);
+        PDTransintion tWhile2 = new PDTransintion(TokenType.WHILE, "do", maintain, qd);
 
-        PDTransintion tOb1 = new PDTransintion("(", empty, maintain, q2);
-        PDTransintion tOb2 = new PDTransintion("(", "do", maintain, q2);
+        PDTransintion tOb1 = new PDTransintion(TokenType.OPEN_BRACKET, empty, maintain, q2);
+        PDTransintion tOb2 = new PDTransintion(TokenType.OPEN_BRACKET, "do", maintain, q2);
 
-        PDTransintion tTrue1 = new PDTransintion("true", empty, maintain, q3);
-        PDTransintion tTrue2 = new PDTransintion("true", "do", maintain, q3);
-        PDTransintion tFalse1 = new PDTransintion("false", empty, maintain, q3);
-        PDTransintion tFalse2 = new PDTransintion("false", "do", maintain, q3);
+        PDTransintion tTrue1 = new PDTransintion(TokenType.BOOLEAN_CONSTANT, empty, maintain, q3);
+        PDTransintion tTrue2 = new PDTransintion(TokenType.BOOLEAN_CONSTANT, "do", maintain, q3);
+        PDTransintion tFalse1 = new PDTransintion(TokenType.BOOLEAN_CONSTANT, empty, maintain, q3);
+        PDTransintion tFalse2 = new PDTransintion(TokenType.BOOLEAN_CONSTANT, "do", maintain, q3);
 
 
-        PDTransintion tCb1 = new PDTransintion(")", empty, maintain, qe);
-        PDTransintion tCb2 = new PDTransintion(")", "do", maintain, qe);
+        PDTransintion tCb1 = new PDTransintion(TokenType.CLOSE_BRACKET, empty, maintain, qe);
+        PDTransintion tCb2 = new PDTransintion(TokenType.CLOSE_BRACKET, "do", maintain, qe);
 
-        PDTransintion tSc1 = new PDTransintion(";", "do", StackOperation.ERASE, q1);
-        PDTransintion tSc2 = new PDTransintion(";", empty, maintain, ef);
+        PDTransintion tSc1 = new PDTransintion(TokenType.SEMI_COLON, "do", StackOperation.ERASE, q1);
+        PDTransintion tSc2 = new PDTransintion(TokenType.SEMI_COLON, empty, maintain, ef);
 
-        PDTransintion tType1 = new PDTransintion("type_tkn", empty, maintain, qf);
-        PDTransintion tType2 = new PDTransintion("type_tkn", "do", maintain, qf);
+        PDTransintion tType1 = new PDTransintion(TokenType.PRIMITIVE_TYPE, empty, maintain, qf);
+        PDTransintion tType2 = new PDTransintion(TokenType.PRIMITIVE_TYPE, "do", maintain, qf);
 
-        PDTransintion tIdentifier1 = new PDTransintion("id_tkn", empty, maintain, qg);
-        PDTransintion tIdentifier2 = new PDTransintion("id_tkn", "do", maintain, qg);
+        PDTransintion tIdentifier1 = new PDTransintion(TokenType.IDENTIFIER, empty, maintain, qg);
+        PDTransintion tIdentifier2 = new PDTransintion(TokenType.IDENTIFIER, "do", maintain, qg);
 
-        PDTransintion tEquals1 = new PDTransintion("=", empty, maintain, qh);
-        PDTransintion tEquals2 = new PDTransintion("=", "do", maintain, qh);
+        PDTransintion tEquals1 = new PDTransintion(TokenType.EQUAL, empty, maintain, qh);
+        PDTransintion tEquals2 = new PDTransintion(TokenType.EQUAL, "do", maintain, qh);
 
-        PDTransintion tCharLit1 = new PDTransintion("charLit_tkn", empty, maintain, qi);
-        PDTransintion tCharLit2 = new PDTransintion("charLit_tkn", "do", maintain, qi);
+        PDTransintion tCharLit1 = new PDTransintion(TokenType.CHARACTER_CONSTANT, empty, maintain, qi);
+        PDTransintion tCharLit2 = new PDTransintion(TokenType.CHARACTER_CONSTANT, "do", maintain, qi);
 
-        PDTransintion tBoolean1 = new PDTransintion("boolean_tkn", empty, maintain, qi);
-        PDTransintion tBoolean2 = new PDTransintion("boolean_tkn", "do", maintain, qi);
+        PDTransintion tBoolean1 = new PDTransintion(TokenType.BOOLEAN_CONSTANT, empty, maintain, qi);
+        PDTransintion tBoolean2 = new PDTransintion(TokenType.BOOLEAN_CONSTANT, "do", maintain, qi);
 
-        PDTransintion tSemiColon1 =  new PDTransintion(";", empty, maintain, q1);
-        PDTransintion tSemiColon2 =  new PDTransintion(";", "do", maintain, q1);
+        PDTransintion tSemiColon1 =  new PDTransintion(TokenType.SEMI_COLON, empty, maintain, q1);
+        PDTransintion tSemiColon2 =  new PDTransintion(TokenType.SEMI_COLON, "do", maintain, q1);
 
         //::: ADDING TRANSITIONS TO STATE
         q0.addTransition(tDo1);
@@ -137,12 +141,11 @@ public class Main {
         try {
             File contentFile = new File("D:\\Feliciano\\ISCTEM\\Quarto_Ano\\Primeiro_Semestre\\Compiladores\\CODE\\src\\dowhile.txt");
             //:: Analise Lexica
-            Tokenizer tk = new Tokenizer(contentFile);
-            tk.parseTokens();
-//            ArrayList<String> tokens = tk.parseTokensAsString();
-            tk.printParsedTokens();
+            LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(contentFile);
+            lexicalAnalyzer.analyze();
+
             //:: Analise Sintatica
-//            PushDownAutomata pda = new PushDownAutomata(q0, tokens);
+//            PushDownAutomata pda = new PushDownAutomata(q0, lexicalAnalyzer.getParsedTokens());
 //            pda.validateInput();
 
         } catch (FileNotFoundException e) {

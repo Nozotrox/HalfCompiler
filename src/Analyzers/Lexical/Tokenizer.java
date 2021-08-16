@@ -1,12 +1,12 @@
-package Analyzer;
+package Analyzers.Lexical;
+
+import Exceptions.TypeErrorException;
 
 import java.io.*;
 import java.util.ArrayList;
 
-public class Tokenizer {
-    private static final int QUOTE_CHARACTER = '\'';
-    private static final int DOUBLE_QUOTE_CHARACTER = '\"';
-    private  ArrayList<Object> tokens = new ArrayList<>();
+class Tokenizer {
+    private  ArrayList<Token> tokens = new ArrayList<>();
     private File contentFile;
 
     public Tokenizer (File contentFile) {
@@ -21,9 +21,9 @@ public class Tokenizer {
         }
     }
 
-    public void parseTokens( ) throws IOException {
+    public void parseTokens( ) throws IOException, TypeErrorException {
         StreamTokenizer streamTokenizer = getConfiguredTokenizer();
-        tokens = tokenize(streamTokenizer);
+        this.tokens = tokenize(streamTokenizer);
     }
 
     private StreamTokenizer getConfiguredTokenizer() throws FileNotFoundException {
@@ -33,8 +33,8 @@ public class Tokenizer {
         return streamTokenizer;
     }
 
-    private ArrayList<Object>  tokenize(StreamTokenizer streamTokenizer) throws IOException {
-        ArrayList<Object> tokens = new ArrayList<>();
+    private ArrayList<Token>  tokenize(StreamTokenizer streamTokenizer) throws IOException, TypeErrorException {
+        ArrayList<Token> tokens = new ArrayList<>();
         int currentTokenCode = streamTokenizer.nextToken();
         char currentToken;
         Token token, linkedToken;
@@ -45,7 +45,7 @@ public class Tokenizer {
                 token = Token.buildWordToken(streamTokenizer.sval, line);
                 tokens.add(token);
             } else if (streamTokenizer.ttype == StreamTokenizer.TT_NUMBER) {
-                tokens.add(streamTokenizer.nval);
+//                tokens.add(streamTokenizer.nval);
             } else if(streamTokenizer.ttype == StreamTokenizer.TT_EOL) {
                 line++;
             } else {
@@ -53,6 +53,7 @@ public class Tokenizer {
                 token = Token.buildOrdinaryToken(currentToken, line);
                 tokens.add(token);
                 if(containsToken(streamTokenizer)) {
+                    tokens.remove(tokens.size() - 1);
                     linkedToken = Token.buildTokenLinkedWithToken(token, streamTokenizer.sval, line);
                     tokens.add(linkedToken);
                 }
@@ -66,7 +67,7 @@ public class Tokenizer {
         return (streamTokenizer.sval != null);
     }
 
-    public ArrayList<Object> getTokens() {
+    public ArrayList<Token> getTokens() {
         return tokens;
     }
 

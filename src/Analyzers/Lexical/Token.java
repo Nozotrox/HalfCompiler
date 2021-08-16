@@ -1,6 +1,8 @@
-package Analyzer;
+package Analyzers.Lexical;
 
-import java.util.ArrayList;
+import Analyzers.TokenType;
+import Exceptions.TypeErrorException;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,13 +45,13 @@ public class Token {
         return token;
     }
 
-    public static Token buildOrdinaryToken(char tokenChar, int line) {
-        TokenType tokenType = getOrdinaryTokenType(tokenChar);
+    public static Token buildOrdinaryToken(char tokenChar, int line) throws TypeErrorException {
+        TokenType tokenType = getOrdinaryTokenType(tokenChar, line);
         Token token = new Token(tokenChar + "", tokenType, line);
         return token;
     }
 
-    public static Token buildTokenLinkedWithToken(Token token, String linkedTokenString, int line) {
+    public static Token buildTokenLinkedWithToken(Token token, String linkedTokenString, int line) throws TypeErrorException {
         TokenType tokenType = getLinkedTokenTypeOf(token, linkedTokenString);
         Token linkedToken = new Token(linkedTokenString, tokenType, line);
         return linkedToken;
@@ -66,8 +68,8 @@ public class Token {
     private static TokenType getSpecialWordTokenType(String tokenString) {
         TokenType tokenType;
         switch (tokenString) {
-            case "do":; //:: NULL STATEMENT
-            case "while": tokenType = TokenType.RESERVED_WORD;break;
+            case "do":; tokenType = TokenType.DO;break;
+            case "while": tokenType = TokenType.WHILE;break;
             case "char":; //:: NULL STATEMENT
             case "boolean": tokenType = TokenType.PRIMITIVE_TYPE;break;
             case "true":; //:: NULL STATEMENT
@@ -78,7 +80,7 @@ public class Token {
         return  tokenType;
     }
 
-    private static TokenType getOrdinaryTokenType(char tokenChar) {
+    private static TokenType getOrdinaryTokenType(char tokenChar, int line) throws TypeErrorException {
         TokenType tokenType;
         switch (tokenChar) {
             case '\'': tokenType = TokenType.SINGLE_QUOTE;break;
@@ -90,18 +92,18 @@ public class Token {
             case ')': tokenType = TokenType.CLOSE_BRACKET;break;
             case '=': tokenType = TokenType.EQUAL;break;
             default:
-                throw new IllegalArgumentException("TypeError: Could not identify " + tokenChar + " .");
+                throw new TypeErrorException("Could not identify " + tokenChar + " .", line);
         }
         return tokenType;
     }
 
-    private static TokenType getLinkedTokenTypeOf(Token token, String linkedTokenString) {
+    private static TokenType getLinkedTokenTypeOf(Token token, String linkedTokenString) throws TypeErrorException {
         TokenType tokenType;
         switch (token.getTokenType()) {
             case SINGLE_QUOTE: tokenType = TokenType.CHARACTER_CONSTANT;break;
             case DOUBLE_QUOTE: tokenType = TokenType.STRING_CONSTANT;break;
             default:
-                throw new IllegalArgumentException("TypeError: Could not identify " + linkedTokenString + " .");
+                throw new TypeErrorException("Could not identify " + linkedTokenString + " .", token.getLine());
         }
         return tokenType;
     }

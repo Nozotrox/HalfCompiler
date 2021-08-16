@@ -1,5 +1,7 @@
-do{
+do {
     char id = false;
-    id = 'c';
+    boolean valid = 'a';
+    valid = 2;
+    id = 'b';
 } while(true);
 

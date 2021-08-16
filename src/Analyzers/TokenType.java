@@ -1,7 +1,8 @@
-package Analyzer;
+package Analyzers;
 
 public enum TokenType {
-    RESERVED_WORD("palavra reservada"),
+    DO("palavra reservada"),
+    WHILE("palavra reservada"),
     OPEN_BRACKET("simbolo especial delimitador de parametro"),
     CLOSE_BRACKET("simbolo especial delimitador de parametro"),
     OPEN_CURLY_BRACKET("simbolo especial delimitador de bloco de codigo"),
@@ -19,5 +20,9 @@ public enum TokenType {
     private final String description;
     TokenType(String description) {
         this.description = description;
+    }
+
+    public String getName() {
+        return this.toString().toLowerCase();
     }
 }

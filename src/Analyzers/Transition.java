@@ -1,4 +1,4 @@
-package Analyzer;
+package Analyzers;
 
 public class Transition {
     protected String entrySymbol;

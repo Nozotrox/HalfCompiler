@@ -1,4 +1,4 @@
-package Analyzer;
+package Analyzers;
 
 public enum StackOperation {
     INSERT,

@@ -1,13 +1,13 @@
-package Analyzer;
+package Analyzers;
 
 import Exceptions.EmptyAutomataStackException;
 
 import javax.naming.OperationNotSupportedException;
-import java.util.EmptyStackException;
 import java.util.Stack;
 
 public class AutomataStack {
     public static final String DEFAULT_EMPTY_STACK_SYMBOL = "z0";
+    private int lineInAnalysis;
 
     Stack<String> stack;
     String bottomOfStackSymbol;
