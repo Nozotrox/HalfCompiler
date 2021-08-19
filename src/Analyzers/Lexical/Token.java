@@ -35,7 +35,7 @@ public class Token {
     }
 
     public void printToken() {
-        System.out.printf("%-20s %-40s %3d\n", this.tokenString, this.tokenType.toString(), this.getLine());
+        System.out.printf("%-20s %-70s %3d\n", this.tokenString, this.tokenType.getDescription(), this.getLine());
     }
 
     public boolean isEmptyToken() {

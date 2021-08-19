@@ -21,7 +21,7 @@ public class PushDownAutomata extends  StateMachine {
 
     @Override
     public boolean validateInput() {
-        printer.printProcess(this.currentState, "");
+//        printer.printProcess(this.currentState, "");
         boolean isValid = processInput();
         System.out.println();
         if(isValid)
@@ -36,7 +36,7 @@ public class PushDownAutomata extends  StateMachine {
         try {
             for(Token entryToken : this.entries) {
                 currentState = currentState.moveToNextStateWith(entryToken, this.stack);
-                this.printer.printProcess(currentState, entryToken.getTokenString());
+//                this.printer.printProcess(currentState, entryToken.getTokenString());
             }
         } catch (OperationNotSupportedException | StateNotFoundException e) {
             System.out.println(((CustomException) e).getErrorMessage());

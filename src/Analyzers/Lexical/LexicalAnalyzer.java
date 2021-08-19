@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 public class LexicalAnalyzer {
     private Tokenizer tokenizer;
@@ -58,18 +57,16 @@ public class LexicalAnalyzer {
     }
 
     private void verifyIdentifierErrors() throws TypeErrorException {
-                collectAllDeclarations();
+        collectAllDeclarations();
         for(Token tokenToAnalyze : this.parsedTokens) {
             if(tokenToAnalyze.getTokenType() == TokenType.IDENTIFIER) {
                 verifyInvalidIdentifierSymbol(tokenToAnalyze);
-                verifyNoDeclarationError(tokenToAnalyze);
                 verifyMultipleDeclarationsError(tokenToAnalyze);
             }
         }
     }
 
     private void collectAllDeclarations() {
-
         boolean isCollectingDeclarations = false;
         String declarationType = "";
         for(Token token : this.parsedTokens) {
@@ -93,129 +90,61 @@ public class LexicalAnalyzer {
         declarationsMap.get(tokenType).add(token);
     }
 
-
-    private void verifyNoDeclarationError(Token tokenToVerify) throws TypeErrorException {
-        if(hasNotBeenDeclared(tokenToVerify))
-            throw new TypeErrorException("Identifier '" + tokenToVerify.getTokenString() + "' has not been declared.", tokenToVerify.getLine());
-    }
-
     private boolean hasNotBeenDeclared(Token tokenToVerify) {
         return !hasBeenDeclared(tokenToVerify);
     }
 
     private boolean hasBeenDeclared(Token tokenToVerify) {
         boolean isDeclared = false;
-        Token currentToken, prevToken;
-        for(int i = 0; i < this.parsedTokens.size(); i++) {
-            currentToken = this.parsedTokens.get(i);
-            prevToken = this.parsedTokens.get(i == 0? i : i - 1);
-            if(tokenToVerify.getTokenString().equals(currentToken.getTokenString())) {
-                if (isDeclarationStatement(prevToken, currentToken)) {
-                    isDeclared = true;
+        for(ArrayList<Token> declaredTokens : this.declarationsMap.values()) {
+            for(Token token : declaredTokens) {
+                isDeclared = token.getTokenString().equals(tokenToVerify.getTokenString());
+                isDeclared = isDeclared && (token.getLine() <= tokenToVerify.getLine());
+                if(isDeclared)
                     break;
-                }
-                else if (isInListDeclaration(prevToken, currentToken)) {
-                    isDeclared = true;
-                    break;
-                }
             }
+            if(isDeclared)
+                break;
         }
-        return  isDeclared;
+        return isDeclared;
     }
 
-    private boolean isInListDeclaration (Token prevToken, Token currentToken) {
-        boolean isInListDeclaration = true;
-        isInListDeclaration = isInListDeclaration && (currentToken.getTokenType() == TokenType.IDENTIFIER);
-        isInListDeclaration = isInListDeclaration && (prevToken.getTokenType() == TokenType.COMMA);
-        if(isInListDeclaration) {
-            Token typeToken = getIdentifierTokenDataType(currentToken);
-            if(typeToken.isEmptyToken())
-                isInListDeclaration = false;
+
+    private String getIdentifierTokenDataType(Token identifierToken) {
+        String tokenType = "";
+        for(String tType: this.declarationsMap.keySet()) {
+            if(this.declarationsMap.get(tType).contains(identifierToken))
+                tokenType = tType;
         }
-        return isInListDeclaration;
-    }
-
-    private Token getIdentifierTokenDataType(Token identifierToken) {
-        int tokenIndex = this.parsedTokens.indexOf(identifierToken);
-        int prevTokenIndex = tokenIndex == 0? 0 : tokenIndex - 1;
-
-        Token typeToken = Token.createEmptyToken();
-        Token prevToIdToken = this.parsedTokens.get(prevTokenIndex);
-        Token iToken;
-
-        if(prevToIdToken.getTokenType() == TokenType.PRIMITIVE_TYPE) {
-            tokenIndex = -1; //:: Skip over the iteration
-            typeToken = prevToIdToken;
-        }
-
-        for(int i = tokenIndex; i >= 0; i--) {
-            iToken = this.parsedTokens.get(i);
-            if(iToken.getTokenType() == TokenType.SEMI_COLON)
-                break;
-            else if (iToken.getTokenType() == TokenType.PRIMITIVE_TYPE) {
-                typeToken = iToken;
-                break;
-            }
-        }
-
-        return typeToken;
+        return tokenType;
     }
 
 
     private void verifyMultipleDeclarationsError(Token tokenToSeek) throws TypeErrorException {
-        int declarationsCount = 0;
-        int lastDeclarationLine = 0;
-        Token iToken, prevToken;
-        for(int i = 0; i < this.parsedTokens.size() ; i++) {
-            iToken = this.parsedTokens.get(i);
-            if(iToken.getTokenString().equals(tokenToSeek.getTokenString())) {
-                prevToken = this.parsedTokens.get(i == 0? i : i - 1);
-                if(isDeclarationStatement(prevToken, iToken)) {
+        int declarationsCount = 0, lastDeclarationLine = 0;
+        for (ArrayList<Token> declaredTokens: this.declarationsMap.values()) {
+            for(Token token : declaredTokens)
+                if(token.getTokenString().equals(tokenToSeek.getTokenString())) {
+                    lastDeclarationLine = token.getLine();
                     declarationsCount++;
-                    lastDeclarationLine = iToken.getLine();
                 }
-            }
         }
-
         if(declarationsCount > 1)
             throw new TypeErrorException("Identifier '" + tokenToSeek.getTokenString() + "' has already been declared.", lastDeclarationLine);
 
     }
 
+    private boolean areTokensInSameScope(Token token1, Token token2) {
+        String levelString1 = getTokenLevel(token1);
+        String levelString2 = getTokenLevel(token2);
+        String scope1 = levelString1.substring(0, levelString1.lastIndexOf("."));
+        String scope2 = levelString2.substring(0, levelString2.lastIndexOf("."));
+        return scope1.equals(scope2);
+    }
+
     private void verifyInvalidIdentifierSymbol (Token tokenToSeek) throws TypeErrorException {
-        Token iToken;
-        Token nextToken;
-        Token prevToken;
-        for(int i = 0; i < this.parsedTokens.size(); i++) {
-            iToken = this.parsedTokens.get(i);
-            if(iToken.getTokenString().equals(tokenToSeek.getTokenString())) {
-                nextToken = this.parsedTokens.get(i == this.parsedTokens.size() - 1? i : i + 1);
-                prevToken = this.parsedTokens.get(i == 0? i : i - 1);
-                if(isDeclarationStatement(prevToken, iToken))
-                    break;
-                else if(isInListDeclaration(prevToken, iToken))
-                    break;
-                else if(isAttributionStatement(iToken, nextToken))
-                    break;
-                else
-                    throw new TypeErrorException("Invalid Symbol for " + iToken.getTokenString(), iToken.getLine());
-            }
-        }
-
-    }
-
-    private boolean isDeclarationStatement(Token prevToken, Token currentToken) {
-        boolean isDeclaration = true;
-        isDeclaration = isDeclaration && (currentToken.getTokenType() == TokenType.IDENTIFIER);
-        isDeclaration = isDeclaration && (prevToken.getTokenType() == TokenType.PRIMITIVE_TYPE);
-        return  isDeclaration;
-    }
-
-    private boolean isAttributionStatement(Token currentToken, Token nextToken) {
-        boolean isAttribution = true;
-        isAttribution = isAttribution && (currentToken.getTokenType() == TokenType.IDENTIFIER);
-        isAttribution = isAttribution && nextToken.getTokenString().equals("=");
-        return isAttribution;
+        if(hasNotBeenDeclared(tokenToSeek))
+            throw new TypeErrorException("Invalid Symbol for " + tokenToSeek.getTokenString(), tokenToSeek.getLine());
     }
 
     private void verifyMalformedElements() throws TypeErrorException {
@@ -226,26 +155,23 @@ public class LexicalAnalyzer {
     }
 
     private void verifyIfCharacterIsMalformed(Token tokenToSeek) throws TypeErrorException {
-        if(tokenToSeek.getTokenString().length() > 1)
+        if(tokenToSeek.getTokenString().length() != 1)
             throw new TypeErrorException("Malformed character literal " + tokenToSeek.getTokenString(), tokenToSeek.getLine());
     }
 
     private void generateSymbolTable() {
-        Token iToken;
-        for(int i = 0; i < this.parsedTokens.size(); i++) {
-            iToken = this.parsedTokens.get(i);
-            if(iToken.getTokenType() == TokenType.IDENTIFIER)
-                createSymbol(iToken, i);
+        for(ArrayList<Token> declaredTokens : this.declarationsMap.values()) {
+            for(Token iToken: declaredTokens)
+                createSymbol(iToken);
         }
     }
 
-    private void createSymbol(Token token, int position) {
-        Token prevToken = this.parsedTokens.get(position == 0? position: position - 1);
-        Token typeToken = getIdentifierTokenDataType(token);
+    private void createSymbol(Token token) {
+        String typeTokenString = getIdentifierTokenDataType(token);
         Symbol symbol = new Symbol(token.getTokenString());
-        if(isDeclarationStatement(prevToken, token) || isInListDeclaration(prevToken, token)) {
+        if(hasBeenDeclared(token)) {
             symbol.category = "variavel";
-            symbol.type = typeToken.getTokenString();
+            symbol.type = typeTokenString;
             symbol.memoryStructure = "simples";
             symbol.level = getTokenLevel(token);
             this.symbolTable.add(symbol);
@@ -256,7 +182,7 @@ public class LexicalAnalyzer {
         String levelString = "0.";
         int lastLineNumber = 0;
         for(Token iToken : this.parsedTokens) {
-            if(iToken.getTokenString().equals(token.getTokenString())){
+            if(iToken == token){
                 levelString += (iToken.getLine() - lastLineNumber);
                 break;
             }

@@ -27,4 +27,5 @@ public enum TokenType {
     public String getName() {
         return this.toString().toLowerCase();
     }
+    public String getDescription() { return this.description;}
 }
