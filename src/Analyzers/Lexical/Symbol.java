@@ -23,6 +23,14 @@ public class Symbol {
         this.dimension = "--";
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
     public void printSymbol() {
         System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s %-20s %-20s %-20s %-20s %-20s\n",
                 id,

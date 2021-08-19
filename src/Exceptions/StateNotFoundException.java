@@ -7,7 +7,7 @@ public class StateNotFoundException extends CustomException {
 
     @Override
     public String getErrorMessage() {
-        return "SyntaxError on line " + this.line + ": \n\t" + this.message;
+        return "Erro sintático na linha " + this.line + ": \n\t" + this.message;
     }
 
 }

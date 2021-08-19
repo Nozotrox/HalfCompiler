@@ -1,4 +1,6 @@
-package Analyzers;
+package Analyzers.Syntax;
+
+import Analyzers.Syntax.State;
 
 public class Transition {
     protected String entrySymbol;

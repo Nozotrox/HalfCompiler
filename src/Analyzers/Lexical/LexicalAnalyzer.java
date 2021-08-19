@@ -1,8 +1,6 @@
 package Analyzers.Lexical;
 
-import Analyzers.TokenType;
-import Exceptions.CustomException;
-import Exceptions.TypeErrorException;
+import Exceptions.LexicalException;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +24,15 @@ public class LexicalAnalyzer {
         return parsedTokens;
     }
 
-    public void analyze() throws IOException, TypeErrorException {
+    public HashMap<String ,ArrayList<Token>> getDeclaraionsMap() {
+        return this.declarationsMap;
+    }
+
+    public ArrayList<Symbol> getSymbolTable() {
+        return symbolTable;
+    }
+
+    public void analyze() throws IOException, LexicalException {
         this.tokenizer.parseTokens();
         this.parsedTokens = this.tokenizer.getTokens();
         verifyLexicalErrors();
@@ -51,25 +57,35 @@ public class LexicalAnalyzer {
         }
     }
 
-    private void verifyLexicalErrors() throws TypeErrorException {
+    private void verifyLexicalErrors() throws LexicalException {
         verifyIdentifierErrors();
         verifyMalformedElements();
     }
 
-    private void verifyIdentifierErrors() throws TypeErrorException {
+    private void verifyIdentifierErrors() throws LexicalException {
         collectAllDeclarations();
         for(Token tokenToAnalyze : this.parsedTokens) {
             if(tokenToAnalyze.getTokenType() == TokenType.IDENTIFIER) {
                 verifyInvalidIdentifierSymbol(tokenToAnalyze);
-                verifyMultipleDeclarationsError(tokenToAnalyze);
             }
         }
     }
 
     private void collectAllDeclarations() {
         boolean isCollectingDeclarations = false;
+        boolean isAttribution = false;
         String declarationType = "";
         for(Token token : this.parsedTokens) {
+            if(token.getTokenType() == TokenType.EQUAL) {
+                isAttribution = true;
+                continue;
+            }
+
+            if(isAttribution) {
+                isAttribution = false;
+                continue;
+            }
+
             if(isCollectingDeclarations)
                 if(token.getTokenType() == TokenType.IDENTIFIER)
                     addToDeclarationMap(declarationType, token);
@@ -120,20 +136,6 @@ public class LexicalAnalyzer {
     }
 
 
-    private void verifyMultipleDeclarationsError(Token tokenToSeek) throws TypeErrorException {
-        int declarationsCount = 0, lastDeclarationLine = 0;
-        for (ArrayList<Token> declaredTokens: this.declarationsMap.values()) {
-            for(Token token : declaredTokens)
-                if(token.getTokenString().equals(tokenToSeek.getTokenString())) {
-                    lastDeclarationLine = token.getLine();
-                    declarationsCount++;
-                }
-        }
-        if(declarationsCount > 1)
-            throw new TypeErrorException("Identifier '" + tokenToSeek.getTokenString() + "' has already been declared.", lastDeclarationLine);
-
-    }
-
     private boolean areTokensInSameScope(Token token1, Token token2) {
         String levelString1 = getTokenLevel(token1);
         String levelString2 = getTokenLevel(token2);
@@ -142,21 +144,21 @@ public class LexicalAnalyzer {
         return scope1.equals(scope2);
     }
 
-    private void verifyInvalidIdentifierSymbol (Token tokenToSeek) throws TypeErrorException {
+    private void verifyInvalidIdentifierSymbol (Token tokenToSeek) throws LexicalException {
         if(hasNotBeenDeclared(tokenToSeek))
-            throw new TypeErrorException("Invalid Symbol for " + tokenToSeek.getTokenString(), tokenToSeek.getLine());
+            throw new LexicalException("Invalid Symbol for " + tokenToSeek.getTokenString(), tokenToSeek.getLine());
     }
 
-    private void verifyMalformedElements() throws TypeErrorException {
+    private void verifyMalformedElements() throws LexicalException {
         for(Token tokenToAnalyze : this.parsedTokens) {
             if(tokenToAnalyze.getTokenType() == TokenType.CHARACTER_CONSTANT)
                 verifyIfCharacterIsMalformed(tokenToAnalyze);
         }
     }
 
-    private void verifyIfCharacterIsMalformed(Token tokenToSeek) throws TypeErrorException {
+    private void verifyIfCharacterIsMalformed(Token tokenToSeek) throws LexicalException {
         if(tokenToSeek.getTokenString().length() != 1)
-            throw new TypeErrorException("Malformed character literal " + tokenToSeek.getTokenString(), tokenToSeek.getLine());
+            throw new LexicalException("Malformed character literal " + tokenToSeek.getTokenString(), tokenToSeek.getLine());
     }
 
     private void generateSymbolTable() {

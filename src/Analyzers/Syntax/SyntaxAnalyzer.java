@@ -1,29 +1,29 @@
 package Analyzers.Syntax;
 
-import Analyzers.*;
 import Analyzers.Lexical.Token;
+import Analyzers.Lexical.TokenType;
+import Exceptions.SyntaxException;
 
 import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
 
-public class SyntaxAnalisis {
-    private ArrayList<Token> tokensToParse;
-    private final int entrySymbolIndex = 0;
-    private final int topOfStackIndex = 1;
-    private final int operationSymbolIndex = 2;
+public class SyntaxAnalyzer {
+    private final ArrayList<Token> tokensToParse;
+    private final boolean isToPrintProcess;
+
     private PushDownAutomata pushDownAutomata;
 
-    public SyntaxAnalisis(ArrayList<Token> tokens) {
+    public SyntaxAnalyzer(ArrayList<Token> tokens, boolean isToPrintProcess) {
         tokensToParse = tokens;
+        this.isToPrintProcess = isToPrintProcess;
     }
 
-    public void makeAnalysis() {
+    public void analyze() throws SyntaxException {
         generateAutomata();
         pushDownAutomata.validateInput();
     }
 
     private void generateAutomata() {
-        String z1 = "z1";
         //:: MAIN STATES
         State q0 = new State("q0", false, true);
         State q1 = new State("q1");
@@ -40,7 +40,7 @@ public class SyntaxAnalisis {
         State qh = new State("qh");
         State qi = new State("qi");
 
-        //::>> BUilding Automata
+        //::>> Building Automata
         createTransitionFromTo(q0, "do z0 z0", StackOperation.MAINTAIN, qa);
         createTransitionFromTo(q0, "type_tkn z0 z1", StackOperation.INSERT, qf);
         createTransitionFromTo(q0, "id_tkn z0 z1", StackOperation.INSERT, qg);
@@ -57,7 +57,7 @@ public class SyntaxAnalisis {
         createTransitionFromTo(q1, "type_tkn z0 z0", StackOperation.MAINTAIN, qf);
         createTransitionFromTo(q1, "type_tkn do do", StackOperation.MAINTAIN, qf);
 
-        //:::>> DELCARATION AND INITIALIZATION VALIDATION
+        //:::>> DECLARATION AND INITIALIZATION VALIDATION
             createTransitionFromTo(qf,"id_tkn z1 z1",StackOperation.MAINTAIN, qg);
             createTransitionFromTo(qf,"id_tkn z0 z0",StackOperation.MAINTAIN, qg);
             createTransitionFromTo(qf,"id_tkn do do",StackOperation.MAINTAIN, qg);
@@ -79,6 +79,9 @@ public class SyntaxAnalisis {
             createTransitionFromTo(qh, "boolean_tkn z1 z1", StackOperation.MAINTAIN, qi);
             createTransitionFromTo(qh, "boolean_tkn do do", StackOperation.MAINTAIN, qi);
             createTransitionFromTo(qh, "boolean_tkn z0 z0", StackOperation.MAINTAIN, qi);
+            createTransitionFromTo(qh, "id_tkn z1 z1", StackOperation.MAINTAIN, qi);
+            createTransitionFromTo(qh, "id_tkn do do", StackOperation.MAINTAIN, qi);
+            createTransitionFromTo(qh, "id_tkn z0 z0", StackOperation.MAINTAIN, qi);
 
             createTransitionFromTo(qi, "; do do", StackOperation.MAINTAIN, q1);
             createTransitionFromTo(qi, "; z0 z0", StackOperation.MAINTAIN, q1);
@@ -106,11 +109,12 @@ public class SyntaxAnalisis {
         createTransitionFromTo(ef, "type_tkn z0 z1", StackOperation.INSERT, qf);
         createTransitionFromTo(ef, "id_tkn z0 z1", StackOperation.INSERT, qg);
 
-        pushDownAutomata = new PushDownAutomata(q0, this.tokensToParse);
+        pushDownAutomata = new PushDownAutomata(q0, this.tokensToParse, this.isToPrintProcess);
 
     }
 
     private void createTransitionFromTo(State from, String transitionName, StackOperation op, State to) {
+        int entrySymbolIndex = 0, topOfStackIndex = 1, operationSymbolIndex = 2;
         String[] transitionSymbols = transitionName.split(" ");
         String topOfStackSymbol = transitionSymbols[topOfStackIndex];
         String operationSymbol = transitionSymbols[operationSymbolIndex];
@@ -127,7 +131,7 @@ public class SyntaxAnalisis {
     }
 
     private TokenType getTokenByText(String tokenText) throws OperationNotSupportedException {
-        TokenType tokenType = null;
+        TokenType tokenType;
         switch (tokenText) {
             case "charLit_tkn" : tokenType = TokenType.CHARACTER_CONSTANT;break;
             case "boolean_tkn": tokenType = TokenType.BOOLEAN_CONSTANT;break;
@@ -145,7 +149,7 @@ public class SyntaxAnalisis {
             case "type_tkn": tokenType = TokenType.PRIMITIVE_TYPE;break;
             case ",": tokenType = TokenType.COMMA;break;
             default:
-                throw new OperationNotSupportedException("Failed To Build Automoata");
+                throw new OperationNotSupportedException("Falha ao construir o automato");
         }
         return tokenType;
     }

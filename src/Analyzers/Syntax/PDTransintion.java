@@ -1,6 +1,7 @@
-package Analyzers;
+package Analyzers.Syntax;
 
 import Analyzers.Lexical.Token;
+import Analyzers.Lexical.TokenType;
 import Exceptions.EmptyAutomataStackException;
 
 import javax.naming.OperationNotSupportedException;

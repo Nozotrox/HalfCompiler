@@ -1,5 +1,8 @@
 package Analyzers;
 
+import Analyzers.Syntax.AutomataStack;
+import Analyzers.Syntax.State;
+
 import java.util.ArrayList;
 
 public class StateMachineProcessPrinter {

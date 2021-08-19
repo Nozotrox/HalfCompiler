@@ -1,4 +1,4 @@
-package Analyzers;
+package Analyzers.Syntax;
 
 import Exceptions.EmptyAutomataStackException;
 

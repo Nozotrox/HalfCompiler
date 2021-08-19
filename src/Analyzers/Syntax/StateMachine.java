@@ -1,6 +1,7 @@
-package Analyzers;
+package Analyzers.Syntax;
 
 import Analyzers.Lexical.Token;
+import Exceptions.SyntaxException;
 
 import java.util.ArrayList;
 
@@ -18,6 +19,6 @@ public abstract  class StateMachine {
         this.entries = new ArrayList<>();
     }
 
-    public abstract boolean validateInput();
+    public abstract boolean validateInput() throws SyntaxException;
 
 }

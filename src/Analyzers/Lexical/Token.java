@@ -1,7 +1,6 @@
 package Analyzers.Lexical;
 
-import Analyzers.TokenType;
-import Exceptions.TypeErrorException;
+import Exceptions.LexicalException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -61,13 +60,13 @@ public class Token {
         return token;
     }
 
-    public static Token buildOrdinaryToken(char tokenChar, int line) throws TypeErrorException {
+    public static Token buildOrdinaryToken(char tokenChar, int line) throws LexicalException {
         TokenType tokenType = getOrdinaryTokenType(tokenChar, line);
         Token token = new Token(tokenChar + "", tokenType, line);
         return token;
     }
 
-    public static Token buildTokenLinkedWithToken(Token token, String linkedTokenString, int line) throws TypeErrorException {
+    public static Token buildTokenLinkedWithToken(Token token, String linkedTokenString, int line) throws LexicalException {
         TokenType tokenType = getLinkedTokenTypeOf(token, linkedTokenString);
         Token linkedToken = new Token(linkedTokenString, tokenType, line);
         return linkedToken;
@@ -91,12 +90,12 @@ public class Token {
             case "true":; //:: NULL STATEMENT
             case "false": tokenType = TokenType.BOOLEAN_CONSTANT;break;
             default:
-                throw new IllegalArgumentException("TypeError: Could not identify " + tokenString + " .");
+                throw new IllegalArgumentException("E: Could not identify " + tokenString + " .");
         }
         return  tokenType;
     }
 
-    private static TokenType getOrdinaryTokenType(char tokenChar, int line) throws TypeErrorException {
+    private static TokenType getOrdinaryTokenType(char tokenChar, int line) throws LexicalException {
         TokenType tokenType;
         switch (tokenChar) {
             case '\'': tokenType = TokenType.SINGLE_QUOTE;break;
@@ -109,18 +108,18 @@ public class Token {
             case '=': tokenType = TokenType.EQUAL;break;
             case ',': tokenType = TokenType.COMMA;break;
             default:
-                throw new TypeErrorException("Could not identify " + tokenChar + " .", line);
+                throw new LexicalException("Could not identify " + tokenChar + " .", line);
         }
         return tokenType;
     }
 
-    private static TokenType getLinkedTokenTypeOf(Token token, String linkedTokenString) throws TypeErrorException {
+    private static TokenType getLinkedTokenTypeOf(Token token, String linkedTokenString) throws LexicalException {
         TokenType tokenType;
         switch (token.getTokenType()) {
             case SINGLE_QUOTE: tokenType = TokenType.CHARACTER_CONSTANT;break;
             case DOUBLE_QUOTE: tokenType = TokenType.STRING_CONSTANT;break;
             default:
-                throw new TypeErrorException("Could not identify " + linkedTokenString + " .", token.getLine());
+                throw new LexicalException("Could not identify " + linkedTokenString + " .", token.getLine());
         }
         return tokenType;
     }

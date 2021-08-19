@@ -1,6 +1,6 @@
 package Analyzers.Lexical;
 
-import Exceptions.TypeErrorException;
+import Exceptions.LexicalException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ class Tokenizer {
         }
     }
 
-    public void parseTokens( ) throws IOException, TypeErrorException {
+    public void parseTokens( ) throws IOException, LexicalException {
         StreamTokenizer streamTokenizer = getConfiguredTokenizer();
         this.tokens = tokenize(streamTokenizer);
     }
@@ -33,7 +33,7 @@ class Tokenizer {
         return streamTokenizer;
     }
 
-    private ArrayList<Token>  tokenize(StreamTokenizer streamTokenizer) throws IOException, TypeErrorException {
+    private ArrayList<Token>  tokenize(StreamTokenizer streamTokenizer) throws IOException, LexicalException {
         ArrayList<Token> tokens = new ArrayList<>();
         int currentTokenCode = streamTokenizer.nextToken();
         char currentToken;
