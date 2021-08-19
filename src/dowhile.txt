@@ -1,7 +1,21 @@
+char three = 'c';
+boolean d = false;
 do {
-    char id = false;
-    boolean valid = 'a';
-    valid = 2;
-    id = 'b';
-} while(true);
+    char one = 'a', tow, three = 'c', d;
+    one = 'c';
+    do {
+        boolean b = true;
+        do {
+            char four = 'a', five, six = 'c', d;
+        } while (true);
+    } while (true);
+    do {
+
+    } while (true);
+
+} while true);
+
+
+
+
 

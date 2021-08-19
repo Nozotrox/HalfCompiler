@@ -1,6 +1,7 @@
 import Analyzers.*;
 import Analyzers.Lexical.LexicalAnalyzer;
 import Analyzers.Lexical.Token;
+import Analyzers.Syntax.SyntaxAnalisis;
 import Exceptions.CustomException;
 import Exceptions.TypeErrorException;
 
@@ -20,11 +21,37 @@ public class Main {
         return content;
     }
 
-
-
     public static void main(String[] args){
-        String empty = AutomataStack.DEFAULT_EMPTY_STACK_SYMBOL;
+
+        //::: Ainda liguei o processo de tokenizacao com o de parsint. Este parsing esta incompleto.
+        // Reconhece domente doWhiles com um _ entre o corpo. Todos tokens devem ser separados por espaco.
+        try {
+            File contentFile = new File("D:\\Feliciano\\ISCTEM\\Quarto_Ano\\Primeiro_Semestre\\Compiladores\\CODE\\src\\dowhile.txt");
+            //:: Analise Lexica
+            LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(contentFile);
+            lexicalAnalyzer.analyze();
+//            lexicalAnalyzer.printSymbolTable();
+//            lexicalAnalyzer.printLexicalTable();
+
+            //:: Analise Sintatica
+            SyntaxAnalisis syntaxAnalisis = new SyntaxAnalisis(lexicalAnalyzer.getParsedTokens());
+//            syntaxAnalisis.makeAnalysis();
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TypeErrorException e) {
+            System.out.println(((CustomException) e).getErrorMessage());
+        }
+
+    }
+}
+
+/*String empty = AutomataStack.DEFAULT_EMPTY_STACK_SYMBOL;
         StackOperation maintain = StackOperation.MAINTAIN;
+        String z1 = "z1";
         //:: MAIN STATES
         State q0 = new State("q0", false, true);
         State q1 = new State("q1");
@@ -72,9 +99,11 @@ public class Main {
 
         PDTransintion tType1 = new PDTransintion(TokenType.PRIMITIVE_TYPE, empty, maintain, qf);
         PDTransintion tType2 = new PDTransintion(TokenType.PRIMITIVE_TYPE, "do", maintain, qf);
+        PDTransintion tType3 = new PDTransintion(TokenType.PRIMITIVE_TYPE, empty, StackOperation.INSERT, qf, z1);
 
         PDTransintion tIdentifier1 = new PDTransintion(TokenType.IDENTIFIER, empty, maintain, qg);
         PDTransintion tIdentifier2 = new PDTransintion(TokenType.IDENTIFIER, "do", maintain, qg);
+        PDTransintion tIdentifier3 = new PDTransintion(TokenType.IDENTIFIER, empty, StackOperation.INSERT, qg);
 
         PDTransintion tEquals1 = new PDTransintion(TokenType.EQUAL, empty, maintain, qh);
         PDTransintion tEquals2 = new PDTransintion(TokenType.EQUAL, "do", maintain, qh);
@@ -88,8 +117,12 @@ public class Main {
         PDTransintion tSemiColon1 =  new PDTransintion(TokenType.SEMI_COLON, empty, maintain, q1);
         PDTransintion tSemiColon2 =  new PDTransintion(TokenType.SEMI_COLON, "do", maintain, q1);
 
+
         //::: ADDING TRANSITIONS TO STATE
         q0.addTransition(tDo1);
+        q0.addTransition(tType3);
+        q0.addTransition(tIdentifier3);
+
 
         qa.addTransition(tOcb1);
         qa.addTransition(tOcb2);
@@ -135,24 +168,4 @@ public class Main {
 
         qe.addTransition(tSc1);
         qe.addTransition(tSc2);
-
-        //::: Ainda liguei o processo de tokenizacao com o de parsint. Este parsing esta incompleto.
-        // Reconhece domente doWhiles com um _ entre o corpo. Todos tokens devem ser separados por espaco.
-        try {
-            File contentFile = new File("D:\\Feliciano\\ISCTEM\\Quarto_Ano\\Primeiro_Semestre\\Compiladores\\CODE\\src\\dowhile.txt");
-            //:: Analise Lexica
-            LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(contentFile);
-            lexicalAnalyzer.analyze();
-
-            //:: Analise Sintatica
-//            PushDownAutomata pda = new PushDownAutomata(q0, lexicalAnalyzer.getParsedTokens());
-//            pda.validateInput();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-}
+*/

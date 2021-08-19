@@ -34,6 +34,22 @@ public class Token {
         return line;
     }
 
+    public void printToken() {
+        System.out.printf("%-20s %-40s %3d\n", this.tokenString, this.tokenType.toString(), this.getLine());
+    }
+
+    public boolean isEmptyToken() {
+        boolean isEmptyToken = true;
+        isEmptyToken = isEmptyToken && this.tokenString.isEmpty();
+        isEmptyToken = isEmptyToken && (this.tokenType == null);
+        isEmptyToken = isEmptyToken && (this.line == -1);
+        return isEmptyToken;
+    }
+
+    public static Token createEmptyToken() {
+        return new Token("", null, -1);
+    }
+
     public static Token buildWordToken(String tokenString, int line) {
         Token token;
         if(canBeIdentifier(tokenString))
@@ -84,13 +100,14 @@ public class Token {
         TokenType tokenType;
         switch (tokenChar) {
             case '\'': tokenType = TokenType.SINGLE_QUOTE;break;
-            case '\"': tokenType = TokenType.DOUBLE_QUOTE;break;
+//            case '\"': tokenType = TokenType.DOUBLE_QUOTE;break;
             case ';': tokenType = TokenType.SEMI_COLON;break;
             case '{': tokenType = TokenType.OPEN_CURLY_BRACKET;break;
             case '}': tokenType = TokenType.CLOSE_CURLY_BRACKET;break;
             case '(': tokenType = TokenType.OPEN_BRACKET;break;
             case ')': tokenType = TokenType.CLOSE_BRACKET;break;
             case '=': tokenType = TokenType.EQUAL;break;
+            case ',': tokenType = TokenType.COMMA;break;
             default:
                 throw new TypeErrorException("Could not identify " + tokenChar + " .", line);
         }
@@ -107,4 +124,6 @@ public class Token {
         }
         return tokenType;
     }
+
+
 }

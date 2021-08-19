@@ -5,6 +5,7 @@ public enum TokenType {
     WHILE("palavra reservada"),
     OPEN_BRACKET("simbolo especial delimitador de parametro"),
     CLOSE_BRACKET("simbolo especial delimitador de parametro"),
+    COMMA("simbolo especial"),
     OPEN_CURLY_BRACKET("simbolo especial delimitador de bloco de codigo"),
     CLOSE_CURLY_BRACKET("simbolo especial delimitador de bloco de codigo"),
     PRIMITIVE_TYPE("tipo primitivo"),
@@ -16,6 +17,7 @@ public enum TokenType {
     DOUBLE_QUOTE("simbolo especial delimitador de strings"),
     EQUAL("simbolo especial de igualidade"),
     IDENTIFIER("identificador");
+
 
     private final String description;
     TokenType(String description) {
