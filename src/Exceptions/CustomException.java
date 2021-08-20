@@ -11,4 +11,7 @@ public abstract class CustomException extends Exception {
 
     public abstract String getErrorMessage();
 
+    public int getLine() {
+        return line;
+    }
 }

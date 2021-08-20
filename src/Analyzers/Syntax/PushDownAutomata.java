@@ -23,7 +23,7 @@ public class PushDownAutomata extends  StateMachine {
     }
 
     @Override
-    public boolean validateInput() throws SyntaxException {
+    public boolean validateInput() throws SyntaxException, EmptyAutomataStackException, OperationNotSupportedException, StateNotFoundException {
         if(this.isToPrintProcess)
             printer.printProcess(this.currentState, "");
         boolean isValid = processInput();
@@ -33,17 +33,17 @@ public class PushDownAutomata extends  StateMachine {
     }
 
     //::: ITERATIVE IMPLEMENTATION
-    private boolean processInput() {
+    private boolean processInput() throws EmptyAutomataStackException, OperationNotSupportedException, StateNotFoundException {
+        Token prevToken = this.entries.get(0) == null? Token.createEmptyToken() : this.entries.get(0);
         try {
             for(Token entryToken : this.entries) {
                 currentState = currentState.moveToNextStateWith(entryToken, this.stack);
-                if(this.isToPrintProcess)
+                if (this.isToPrintProcess)
                     this.printer.printProcess(currentState, entryToken.getTokenString());
+                prevToken = entryToken;
             }
-        } catch (OperationNotSupportedException | StateNotFoundException e) {
-            System.out.println(((CustomException) e).getErrorMessage());
-        } catch (EmptyAutomataStackException e) {
-            e.printStackTrace();
+        } catch (StateNotFoundException e) {
+            throw new StateNotFoundException("Estrutura sintática não reconhecida.", prevToken.getLine());
         }
         return this.currentState.isFinalState();
     }

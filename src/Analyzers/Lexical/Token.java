@@ -11,9 +11,9 @@ public class Token {
     private static final List<String> literalConstants = Arrays.asList("true", "false");
 
 
-    private final String tokenString;
-    private final TokenType tokenType;
-    private final int line;
+    final String tokenString;
+    final TokenType tokenType;
+    final int line;
 
     public Token(String tokenString, TokenType tokenType, int line) {
         this.tokenString = tokenString;

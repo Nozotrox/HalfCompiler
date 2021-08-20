@@ -1,8 +1,11 @@
 package Analyzers.Syntax;
 
 import Analyzers.Lexical.Token;
+import Exceptions.EmptyAutomataStackException;
+import Exceptions.StateNotFoundException;
 import Exceptions.SyntaxException;
 
+import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
 
 public abstract  class StateMachine {
@@ -19,6 +22,6 @@ public abstract  class StateMachine {
         this.entries = new ArrayList<>();
     }
 
-    public abstract boolean validateInput() throws SyntaxException;
+    public abstract boolean validateInput() throws SyntaxException, EmptyAutomataStackException, OperationNotSupportedException, StateNotFoundException;
 
 }

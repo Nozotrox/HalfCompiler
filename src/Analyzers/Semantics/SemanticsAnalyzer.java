@@ -1,5 +1,6 @@
 package Analyzers.Semantics;
 
+import Analyzers.Lexical.LexicalAnalyzer;
 import Analyzers.Lexical.Symbol;
 import Analyzers.Lexical.Token;
 import Analyzers.Lexical.TokenType;
@@ -18,6 +19,7 @@ public class SemanticsAnalyzer {
         this.declarationsMap = declarationsMap;
         this.symbolsTable = symbolsTable;
     }
+    // char abc = 'a';
 
     public void analyze() throws SemanticsException {
         Token tokenToAnalyze, leftOperand, rightOperand;
@@ -37,17 +39,28 @@ public class SemanticsAnalyzer {
     private void verifyMultipleDeclarationsError(Token tokenToSeek) throws SemanticsException {
         int declarationsCount = 0, lastDeclarationLine = 0;
         for (ArrayList<Token> declaredTokens: this.declarationsMap.values()) {
-            for(Token token : declaredTokens)
-                if(token.getTokenString().equals(tokenToSeek.getTokenString())) {
+            int tokenPosition = declaredTokens.indexOf(tokenToSeek);
+            for(Token token : declaredTokens) {
+                if (declaredTokens.indexOf(token) < tokenPosition)
+                    continue;
+                if (token.getTokenString().equals(tokenToSeek.getTokenString()) && isThereScopeConfict(tokenToSeek, token)) {
                     lastDeclarationLine = token.getLine();
                     declarationsCount++;
                 }
+            }
         }
         if(declarationsCount > 1)
             throw new SemanticsException("Identificador '" + tokenToSeek.getTokenString() + "' ja foi declarado.", lastDeclarationLine);
 
     }
 
+    private boolean isThereScopeConfict(Token token1, Token token2) {
+        String levelString1 = LexicalAnalyzer.getTokenLevel(token1, this.parsedTokens);
+        String levelString2 = LexicalAnalyzer.getTokenLevel(token2, this.parsedTokens);
+        return levelString1.length() <= levelString2.length();
+    }
+
+// 'a', false;
     private void verifyTypeCompatibilityInAttribution(Token leftOperand, Token rightOperand) throws SemanticsException {
         String leftOperandType = getOperandDataType(leftOperand);
         String rightOperandType;

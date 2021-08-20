@@ -136,13 +136,7 @@ public class LexicalAnalyzer {
     }
 
 
-    private boolean areTokensInSameScope(Token token1, Token token2) {
-        String levelString1 = getTokenLevel(token1);
-        String levelString2 = getTokenLevel(token2);
-        String scope1 = levelString1.substring(0, levelString1.lastIndexOf("."));
-        String scope2 = levelString2.substring(0, levelString2.lastIndexOf("."));
-        return scope1.equals(scope2);
-    }
+
 
     private void verifyInvalidIdentifierSymbol (Token tokenToSeek) throws LexicalException {
         if(hasNotBeenDeclared(tokenToSeek))
@@ -175,23 +169,31 @@ public class LexicalAnalyzer {
             symbol.category = "variavel";
             symbol.type = typeTokenString;
             symbol.memoryStructure = "simples";
-            symbol.level = getTokenLevel(token);
+            symbol.level = LexicalAnalyzer.getTokenLevel(token, this.parsedTokens);
             this.symbolTable.add(symbol);
         }
     }
 
-    private String getTokenLevel(Token token) {
+    public static String getTokenLevel(Token token, ArrayList<Token> parsedTokens) {
         String levelString = "0.";
+        boolean toAdd = false;
         int lastLineNumber = 0;
-        for(Token iToken : this.parsedTokens) {
+        for(Token iToken : parsedTokens) {
             if(iToken == token){
-                levelString += (iToken.getLine() - lastLineNumber);
+                levelString += toAdd? lastLineNumber + (iToken.getLine() - lastLineNumber):iToken.getLine() - lastLineNumber;
                 break;
             }
 
             if(iToken.getTokenType() == TokenType.DO) {
                 levelString += (iToken.getLine() - lastLineNumber) + ".";
                 lastLineNumber = iToken.getLine();
+                toAdd = false;
+            }
+            if (iToken.getTokenType() == TokenType.WHILE) {
+                levelString = levelString.substring(0, levelString.length() - 1);
+                int lastLevelIndex = levelString.lastIndexOf(".");
+                levelString = levelString.substring(0, lastLevelIndex + 1);
+                toAdd = true;
             }
         }
         return levelString;

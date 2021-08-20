@@ -26,7 +26,7 @@ class Tokenizer {
         this.tokens = tokenize(streamTokenizer);
     }
 
-    private StreamTokenizer getConfiguredTokenizer() throws FileNotFoundException {
+    private StreamTokenizer getConfiguredTokenizer() throws IOException {
         FileReader fr = new FileReader(this.contentFile);
         StreamTokenizer streamTokenizer = new StreamTokenizer(fr);
         streamTokenizer.eolIsSignificant(true);

@@ -2,6 +2,8 @@ package Analyzers.Syntax;
 
 import Analyzers.Lexical.Token;
 import Analyzers.Lexical.TokenType;
+import Exceptions.EmptyAutomataStackException;
+import Exceptions.StateNotFoundException;
 import Exceptions.SyntaxException;
 
 import javax.naming.OperationNotSupportedException;
@@ -18,7 +20,7 @@ public class SyntaxAnalyzer {
         this.isToPrintProcess = isToPrintProcess;
     }
 
-    public void analyze() throws SyntaxException {
+    public void analyze() throws SyntaxException, EmptyAutomataStackException, OperationNotSupportedException, StateNotFoundException {
         generateAutomata();
         pushDownAutomata.validateInput();
     }

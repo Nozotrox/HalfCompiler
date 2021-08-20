@@ -1,11 +1,4 @@
-char three = 'c';
-boolean d = false;
-do {   boolean one = false, tow; one = true; do {
-        boolean b = true;
-        do { char four = 'a', five, six = 'c';
-            three = 'c'; } while (true);
-    } while (true);
-    do {
-    } while (true);
-} while (true);
-
+char b = 'd';
+do {
+    char b = 'a';
+} while(true);

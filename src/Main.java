@@ -22,7 +22,7 @@ public class Main {
 
             //:: Analise Sintatica
             SyntaxAnalyzer syntaxAnalisis = new SyntaxAnalyzer(lexicalAnalyzer.getParsedTokens(), false);
-            syntaxAnalisis.analyze();
+//            syntaxAnalisis.analyze();
 
             //:: Analise Semantica
             SemanticsAnalyzer semanticsAnalyzer = new SemanticsAnalyzer(lexicalAnalyzer.getParsedTokens(), lexicalAnalyzer.getDeclaraionsMap(), lexicalAnalyzer.getSymbolTable());
@@ -38,9 +38,15 @@ public class Main {
             System.out.println("\n" + ((CustomException) e).getErrorMessage());
         } catch (SemanticsException e) {
             System.out.println("\n" + ((CustomException) e).getErrorMessage());
-        } catch (SyntaxException e) {
-            System.out.println("\n" + ((CustomException) e).getErrorMessage());
-        }
+       } // catch (SyntaxException e) {
+//            System.out.println("\n" + ((CustomException) e).getErrorMessage());
+//        }
+
+        int max = 10;
+        do {
+            int bb = 20;
+        } while (max <= 10);
+        int bb;
 
     }
 }
